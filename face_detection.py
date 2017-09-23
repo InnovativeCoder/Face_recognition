@@ -13,31 +13,32 @@ data = []
 ix = 0
 
 while True:
+    
     ret, frame = cam.read()
-    if ret == True:
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = face_cas.detectMultiScale(gray,1.3,5)
-        
-        for(x,y,w,h) in faces :
-            face_component = frame[y:y+h,x:x+w,:]
+    if not ret:
+        continue
+
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = face_cas.detectMultiScale(gray,1.3,5)
             
-            fc = cv2.resize(face_component,(50,50))
-            
-            if ix%10 == 0 and len(data) <20:
-                data.append(fc)
+    for(x,y,w,h) in faces :
+        face_component = frame[y:y+h,x:x+w,:]
                 
-            cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0), 2)
-        ix += 1
-        cv2.imshow('frame',frame)
-        if cv2.waitKey(1) == 27 or len(data) >= 20:
-            break
-    else :
-        print("error")
+        fc = cv2.resize(face_component,(50,50))
+                
+        if ix%10 == 0 and len(data) <20:
+            data.append(fc)
+                    
+        cv2.rectangle(frame,(x,y),(x+w,y+h),(0,255,0),2)
+         
+    ix += 1
+    cv2.imshow('frame',frame)
+    if cv2.waitKey(1) == 27 or len(data) >= 20:
+        break
+
 
 cv2.destroyAllWindows()
 data = np.asarray(data)
 
 print(data.shape)
 np.save('face_01', data)
-
-
